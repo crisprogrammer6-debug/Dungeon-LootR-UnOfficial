@@ -56,4 +56,3 @@ If the repo is named `<user>.github.io`, the site is the user homepage (`https:/
 Included: HTML (except `calc.html`), `css/`, `js/`, `data/*.js`, `assets/`, `.nojekyll`, `404.html`.
 
 Excluded: `tools/`, Python scripts, `calc.html`, this README.
-"# Dungeon-LootR-UnOfficial" 

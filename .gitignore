@@ -1,0 +1,19 @@
+# Secrets — never commit
+tools/suggestions-webhook.txt
+tools/suggestions-bot.env
+data/suggestions-inbox.jsonl
+
+# Local / OS
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Local scratch (not the site)
+_item_info/
+_item_info2/
+_fix_item_icons.py
+imagen.png

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dungeon LootR — Suggestions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/app.css?v=87" />
+  </head>
+  <body class="is-suggest">
+    <div class="atmosphere" aria-hidden="true"></div>
+    <main class="frame">
+      <header class="masthead">
+        <div class="brand">
+          <span>Dungeon LootR</span>
+          <strong>Inbox</strong>
+        </div>
+        <div class="title-block">
+          <div class="ornament"><i></i><span></span><i></i></div>
+          <h1>Suggestions</h1>
+          <div class="ornament invert"><i></i><span></span><i></i></div>
+        </div>
+        <a class="game-mark" href="index.html">
+          <img src="assets/img/logo.png?v=8" alt="Dungeon LootR" />
+        </a>
+      </header>
+      <nav id="site-nav" class="site-nav" aria-label="Primary"></nav>
+      <section class="suggest-stage">
+        <form class="suggest-form" id="suggest-form" novalidate>
+          <p class="suggest-kicker">Drop a note</p>
+          <h2 class="suggest-heading">What should we look at?</h2>
+          <p class="suggest-lead">Adds, fixes, missing details — keep it short and clear.</p>
+          <label class="suggest-field">
+            <span>Your idea</span>
+            <textarea id="suggest-body" name="body" rows="7" maxlength="1000" required placeholder="Write it here…"></textarea>
+            <small class="suggest-count" id="suggest-count">0 / 1000</small>
+          </label>
+          <div class="suggest-row">
+            <label class="suggest-field">
+              <span>Discord <em>optional</em></span>
+              <input id="suggest-discord" name="discord" type="text" maxlength="80" placeholder="If we need to follow up" autocomplete="off" />
+            </label>
+            <button type="submit">Send</button>
+          </div>
+          <p class="suggest-status" id="suggest-status" role="status"></p>
+        </form>
+      </section>
+      <p class="foot" id="source"></p>
+    </main>
+    <script src="data/site.js?v=31"></script>
+    <script src="data/search-index.js?v=1"></script>
+    <script src="js/site.js?v=30"></script>
+    <script src="js/search.js?v=1"></script>
+    <script src="data/suggestions-config.js?v=3"></script>
+    <script src="js/suggestions.js?v=4"></script>
+  </body>
+</html>

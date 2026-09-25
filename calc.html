@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Class calc — private</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-0: #05060b;
+        --ink: #f3eee4;
+        --muted: #9a9488;
+        --faint: #6a655c;
+        --gold: #d4b15a;
+        --gold-hot: #f3d995;
+        --line: rgba(232, 210, 140, 0.12);
+        --dread: #c45b7a;
+        --drag: #5aa8d4;
+        --buff: #6fd4a2;
+      }
+
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bg-0);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+      }
+      body {
+        background:
+          radial-gradient(900px 420px at 50% -8%, rgba(212, 177, 90, 0.14), transparent 58%),
+          radial-gradient(700px 500px at 8% 88%, rgba(120, 40, 70, 0.12), transparent 50%),
+          radial-gradient(640px 420px at 94% 18%, rgba(50, 80, 140, 0.12), transparent 55%),
+          linear-gradient(180deg, #0c0d16 0%, #05060b 40%, #07080f 100%);
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 36px 20px 80px;
+      }
+      .eyebrow {
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        font-size: 11px;
+        color: var(--faint);
+      }
+      h1 {
+        font-family: Cinzel, serif;
+        font-weight: 700;
+        margin: 8px 0 6px;
+        letter-spacing: 0.08em;
+      }
+      .lead {
+        color: var(--muted);
+        max-width: 62ch;
+        line-height: 1.5;
+        margin: 0 0 28px;
+      }
+      .ornament {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: min(360px, 80%);
+        margin: 0 0 18px;
+      }
+      .ornament span {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(90deg, var(--gold), transparent);
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      @media (max-width: 960px) {
+        .grid { grid-template-columns: 1fr; }
+      }
+      .card {
+        background: rgba(12, 13, 22, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px 16px 14px;
+      }
+      .card h2 {
+        font-family: Cinzel, serif;
+        font-size: 18px;
+        margin: 0 0 4px;
+      }
+      .tag {
+        display: inline-block;
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 12px;
+      }
+      .card.dread { box-shadow: inset 0 2px 0 var(--dread); }
+      .card.drag { box-shadow: inset 0 2px 0 var(--drag); }
+      .card.buff { box-shadow: inset 0 2px 0 var(--buff); }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th, td {
+        text-align: left;
+        padding: 7px 4px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th { color: var(--faint); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+      td.mono, .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+      .null { color: var(--faint); }
+      .op {
+        color: var(--gold-hot);
+        font-size: 11px;
+        display: block;
+        margin-top: 2px;
+      }
+      .total-row td {
+        border-bottom: 0;
+        padding-top: 12px;
+        font-weight: 600;
+        color: var(--gold);
+      }
+      .section {
+        margin-top: 28px;
+      }
+      .section h3 {
+        font-family: Cinzel, serif;
+        font-size: 15px;
+        letter-spacing: 0.1em;
+        margin: 0 0 12px;
+      }
+      .ops {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 16px;
+      }
+      @media (max-width: 860px) {
+        .ops { grid-template-columns: 1fr; }
+      }
+      label {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin: 10px 0 6px;
+      }
+      input, select {
+        width: 100%;
+        background: #0a0b14;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 12px;
+        font: 500 14px "IBM Plex Mono", ui-monospace, monospace;
+      }
+      .row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+      }
+      .result {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(212, 177, 90, 0.08);
+        border: 1px solid rgba(212, 177, 90, 0.22);
+      }
+      .result strong { color: var(--gold-hot); font-family: "IBM Plex Mono", monospace; }
+      .bars { display: grid; gap: 10px; }
+      .bar-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+      .track {
+        height: 10px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .fill { height: 100%; border-radius: 99px; }
+      .fill.dread { background: var(--dread); }
+      .fill.drag { background: var(--drag); }
+      .fill.buff { background: var(--buff); }
+      .hint { color: var(--muted); font-size: 12px; line-height: 1.45; }
+      .compare td:nth-child(n+2) { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="eyebrow">Unlisted · not in site nav</p>
+      <h1>Class calc</h1>
+      <div class="ornament"><span></span></div>
+      <p class="lead">
+        Dreadlord vs Dragoon vs Dragoon buffed: hits, cooldowns, listed DPS,
+        and the same numbers run through burst / cooldown.
+      </p>
+
+      <div class="grid" id="class-cards"></div>
+
+      <section class="section">
+        <h3>Side by side</h3>
+        <div class="card">
+          <table class="compare" id="compare"></table>
+        </div>
+      </section>
+
+      <section class="section ops">
+        <div class="card">
+          <h3>Operations</h3>
+          <p class="hint">
+            Burst = hit × count (or sum of listed hits). DPS = burst ÷ cooldown.
+            Dragoon A2 keeps the three listed hits and CDs.
+          </p>
+          <label>Class</label>
+          <select id="op-class"></select>
+          <label>Ability</label>
+          <select id="op-ability"></select>
+          <div class="row-3">
+            <div>
+              <label>Window (s)</label>
+              <input id="op-window" type="number" min="1" step="1" value="60" />
+            </div>
+            <div>
+              <label>Hits override</label>
+              <input id="op-hits" type="number" min="1" step="1" placeholder="auto" />
+            </div>
+            <div>
+              <label>CD override</label>
+              <input id="op-cd" type="number" min="0.1" step="0.001" placeholder="auto" />
+            </div>
+          </div>
+          <div class="result" id="op-out"></div>
+        </div>
+
+        <div class="card">
+          <h3>Custom formula</h3>
+          <p class="hint">Any skill. Use k in the hit field if you want (e.g. 53.85k).</p>
+          <div class="row-3">
+            <div>
+              <label>Hit</label>
+              <input id="c-hit" value="53.85k" />
+            </div>
+            <div>
+              <label>× hits</label>
+              <input id="c-n" type="number" min="1" step="1" value="2" />
+            </div>
+            <div>
+              <label>Cooldown</label>
+              <input id="c-cd" type="number" min="0.1" step="0.001" value="4" />
+            </div>
+          </div>
+          <div class="result" id="c-out"></div>
+          <div class="bars" id="dps-bars" style="margin-top:18px"></div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const k = (n) => n * 1000;
+      const fmt = (n) => {
+        const abs = Math.abs(n);
+        if (abs >= 1000) return (n / 1000).toFixed(2).replace(/\.00$/, "") + "k";
+        return String(Math.round(n * 100) / 100);
+      };
+      const parseK = (s) => {
+        if (s == null || s === "") return NaN;
+        const t = String(s).trim().toLowerCase().replace(/,/g, "");
+        if (t === "null") return NaN;
+        const m = t.match(/^(-?\d+(?:\.\d+)?)(k)?$/);
+        if (!m) return Number(t);
+        return m[2] ? Number(m[1]) * 1000 : Number(m[1]);
+      };
+
+      const CLASSES = [
+        {
+          id: "dread",
+          name: "Dreadlord",
+          tag: "Hits · DPS · CD",
+          m1: k(8.97),
+          skills: [
+            { id: "A1", hits: [k(53.85), k(53.85)], cd: 4, listedDps: k(26.79) },
+            { id: "A2", hits: Array(9).fill(k(23.69)), cd: 8, listedDps: k(26.65) },
+            { id: "A3", hits: [k(75.39), k(150.78)], cd: 8, listedDps: k(28.27) },
+            { id: "A4", hits: Array(5).fill(k(17.23)), cd: 10, listedDps: k(8.61) },
+          ],
+          listedTotal: k(90.32),
+        },
+        {
+          id: "drag",
+          name: "Dragoon",
+          tag: "Hits · DPS · CD",
+          m1: k(11.37),
+          skills: [
+            { id: "A1", hits: [k(68.19)], cd: 6, listedDps: k(11.36) },
+            {
+              id: "A2",
+              hits: [k(34.1), k(61.37), k(95.47)],
+              cds: [5.445, 6.05, 9.075],
+              listedDps: k(22.76),
+            },
+            { id: "A3", hits: [k(88.13)], cd: 8, listedDps: k(11.02) },
+            { id: "A4", hits: [], cd: 18, listedDps: 0, nullSkill: true },
+          ],
+          listedTotal: k(45.14),
+        },
+        {
+          id: "buff",
+          name: "Dragoon [Buffed]",
+          tag: "Same CDs as Dragoon",
+          m1: k(13.64),
+          skills: [
+            { id: "A1", hits: [k(81.83)], cd: 6, listedDps: k(13.63) },
+            {
+              id: "A2",
+              hits: [k(40.91), k(73.65), k(105) ],
+              cds: [5.445, 6.05, 9.075],
+              listedDps: k(26.68),
+            },
+            { id: "A3", hits: [k(105.75)], cd: 8, listedDps: k(13.22) },
+            { id: "A4", hits: [], cd: 18, listedDps: 0, nullSkill: true },
+          ],
+          listedTotal: k(53.53),
+        },
+      ];
+
+      function burst(skill) {
+        if (skill.nullSkill) return 0;
+        return skill.hits.reduce((a, b) => a + b, 0);
+      }
+
+      function computedDps(skill) {
+        if (skill.nullSkill) return 0;
+        if (skill.cds) {
+          return skill.hits.reduce((sum, hit, i) => sum + hit / skill.cds[i], 0);
+        }
+        return burst(skill) / skill.cd;
+      }
+
+      function hitLabel(skill) {
+        if (skill.nullSkill) return "Null";
+        if (skill.id === "A3" && skill.hits.length === 2) {
+          return `${fmt(skill.hits[0])} + ${fmt(skill.hits[1])}`;
+        }
+        if (skill.cds) return skill.hits.map(fmt).join(" / ");
+        const uniq = [...new Set(skill.hits)];
+        if (uniq.length === 1 && skill.hits.length > 1) {
+          return `${fmt(uniq[0])} × ${skill.hits.length}`;
+        }
+        return skill.hits.map(fmt).join(" + ");
+      }
+
+      function cdLabel(skill) {
+        if (skill.cds) return skill.cds.map((n) => n + "s").join(" / ");
+        return skill.cd + "s";
+      }
+
+      function formula(cls, skill) {
+        if (skill.nullSkill) return "no skill";
+        if (skill.cds) {
+          return skill.hits
+            .map((h, i) => `${fmt(h)} ÷ ${skill.cds[i]}s`)
+            .join(" + ");
+        }
+        return `${fmt(burst(skill))} ÷ ${skill.cd}s`;
+      }
+
+      function renderCards() {
+        document.getElementById("class-cards").innerHTML = CLASSES.map((cls) => {
+          const rows = skillRows(cls);
+          return `<article class="card ${cls.id}">
+            <h2>${cls.name}</h2>
+            <div class="tag">${cls.tag} · M1 ${fmt(cls.m1)}</div>
+            <table>
+              <thead><tr><th>Skill</th><th>Hit</th><th>CD</th><th>Burst</th><th>DPS</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </article>`;
+        }).join("");
+      }
+
+      function skillRows(cls) {
+        const body = cls.skills
+          .map((s) => {
+            if (s.nullSkill) {
+              return `<tr><td>${s.id}</td><td class="null">Null</td><td class="mono">${cdLabel(s)}</td><td class="null">—</td><td class="null">—</td></tr>`;
+            }
+            const calc = computedDps(s);
+            return `<tr>
+              <td>${s.id}</td>
+              <td class="mono">${hitLabel(s)}<span class="op">${formula(cls, s)}</span></td>
+              <td class="mono">${cdLabel(s)}</td>
+              <td class="mono">${fmt(burst(s))}</td>
+              <td class="mono">${fmt(calc)}/s
+                <span class="op">listed ${fmt(s.listedDps)}/s</span>
+              </td>
+            </tr>`;
+          })
+          .join("");
+        const totalCalc = cls.skills.reduce((a, s) => a + computedDps(s), 0);
+        return (
+          body +
+          `<tr class="total-row"><td colspan="4">Total DPS</td><td class="mono">${fmt(totalCalc)}/s
+            <span class="op">listed ${fmt(cls.listedTotal)}/s</span></td></tr>`
+        );
+      }
+
+      function renderCompare() {
+        const skills = ["M1", "A1", "A2", "A3", "A4", "Total DPS"];
+        const head = `<thead><tr><th></th>${CLASSES.map((c) => `<th>${c.name}</th>`).join("")}</tr></thead>`;
+        const body = skills
+          .map((key) => {
+            const cells = CLASSES.map((cls) => {
+              if (key === "M1") return fmt(cls.m1);
+              if (key === "Total DPS") return `${fmt(cls.listedTotal)}/s`;
+              const s = cls.skills.find((x) => x.id === key);
+              if (s.nullSkill) return "Null";
+              return `${hitLabel(s)} · ${fmt(s.listedDps)}/s`;
+            });
+            return `<tr><td>${key}</td>${cells.map((c) => `<td>${c}</td>`).join("")}</tr>`;
+          })
+          .join("");
+        document.getElementById("compare").innerHTML = head + `<tbody>${body}</tbody>`;
+      }
+
+      function renderBars() {
+        const max = Math.max(...CLASSES.map((c) => c.listedTotal));
+        document.getElementById("dps-bars").innerHTML = CLASSES.map((c) => {
+          const pct = (c.listedTotal / max) * 100;
+          return `<div>
+            <div class="bar-label"><span>${c.name}</span><span class="mono">${fmt(c.listedTotal)}/s</span></div>
+            <div class="track"><div class="fill ${c.id}" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join("");
+      }
+
+      const classSel = document.getElementById("op-class");
+      const abSel = document.getElementById("op-ability");
+      CLASSES.forEach((c) => {
+        classSel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+      });
+
+      function fillAbilities() {
+        const cls = CLASSES.find((c) => c.id === classSel.value);
+        abSel.innerHTML = cls.skills.map((s) => `<option value="${s.id}">${s.id}</option>`).join("");
+        runOps();
+      }
+
+      function runOps() {
+        const cls = CLASSES.find((c) => c.id === classSel.value);
+        const skill = cls.skills.find((s) => s.id === abSel.value);
+        const windowS = Number(document.getElementById("op-window").value) || 60;
+        const hitOverride = document.getElementById("op-hits").value;
+        const cdOverride = document.getElementById("op-cd").value;
+
+        if (skill.nullSkill && !hitOverride) {
+          document.getElementById("op-out").innerHTML = `<strong>${cls.name} ${skill.id}</strong> is Null.`;
+          return;
+        }
+
+        let hits = skill.hits.slice();
+        if (hitOverride) {
+          const n = Number(hitOverride);
+          const unit = hits[0] || 0;
+          hits = Array.from({ length: n }, () => unit);
+        }
+        const b = hits.reduce((a, v) => a + v, 0);
+
+        let dps;
+        let cdNote;
+        if (cdOverride) {
+          const cd = Number(cdOverride);
+          dps = b / cd;
+          cdNote = cd + "s (override)";
+        } else if (skill.cds) {
+          dps = hits.reduce((sum, hit, i) => sum + hit / (skill.cds[i] || skill.cds[skill.cds.length - 1]), 0);
+          cdNote = skill.cds.join("s / ") + "s";
+        } else {
+          dps = b / skill.cd;
+          cdNote = skill.cd + "s";
+        }
+
+        const casts = skill.cds
+          ? hits.map((_, i) => Math.floor(windowS / (Number(cdOverride) || skill.cds[i])))
+          : Math.floor(windowS / (Number(cdOverride) || skill.cd));
+        const windowDmg = skill.cds && !cdOverride
+          ? hits.reduce((sum, hit, i) => sum + hit * Math.floor(windowS / skill.cds[i]), 0)
+          : b * (typeof casts === "number" ? casts : casts.reduce((a, n) => a + n, 0) / hits.length);
+
+        const windowDmg2 = (() => {
+          if (cdOverride) return b * Math.floor(windowS / Number(cdOverride));
+          if (skill.cds) return hits.reduce((sum, hit, i) => sum + hit * Math.floor(windowS / skill.cds[i]), 0);
+          return b * Math.floor(windowS / skill.cd);
+        })();
+
+        document.getElementById("op-out").innerHTML = `
+          <div><strong>${cls.name} ${skill.id}</strong></div>
+          Burst <strong>${fmt(b)}</strong> · CD ${cdNote}<br>
+          DPS <strong>${fmt(dps)}/s</strong> · listed <strong>${fmt(skill.listedDps)}/s</strong><br>
+          In ${windowS}s ≈ <strong>${fmt(windowDmg2)}</strong>
+          (${typeof casts === "number" ? casts + " casts" : casts.map((n, i) => `hit${i + 1}×${n}`).join(", ")})
+        `;
+      }
+
+      function runCustom() {
+        const hit = parseK(document.getElementById("c-hit").value);
+        const n = Number(document.getElementById("c-n").value) || 1;
+        const cd = Number(document.getElementById("c-cd").value);
+        if (!Number.isFinite(hit) || !Number.isFinite(cd) || cd <= 0) {
+          document.getElementById("c-out").textContent = "Enter a hit and a cooldown.";
+          return;
+        }
+        const burstV = hit * n;
+        const dps = burstV / cd;
+        document.getElementById("c-out").innerHTML = `
+          ${fmt(hit)} × ${n} = <strong>${fmt(burstV)}</strong> burst<br>
+          ${fmt(burstV)} ÷ ${cd}s = <strong>${fmt(dps)}/s</strong>
+        `;
+      }
+
+      classSel.addEventListener("change", fillAbilities);
+      abSel.addEventListener("change", runOps);
+      ["op-window", "op-hits", "op-cd"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", runOps);
+      });
+      ["c-hit", "c-n", "c-cd"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", runCustom);
+      });
+
+      renderCards();
+      renderCompare();
+      renderBars();
+      fillAbilities();
+      runCustom();
+    </script>
+  </body>
+</html>
